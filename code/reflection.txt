@@ -1,4 +1,4 @@
-Write your reflection here.
+This assignment helped me understand how Streamlit can be used to create interactive programs that process and display data. I learned how file uploads, JSON files, buttons, and session state work together, especially how session state can remember information across reruns. I also learned that small details, such as exact titles, file types, and indentation, can make a big difference when testing a program. Overall, this assignment improved my debugging skills and helped me become more comfortable connecting different parts of a Python application.
 
 See reflection.md for what makes a good reflection — be specific, use the
 terminology from this assignment (rerun, widget, return value, guard, bytes vs.

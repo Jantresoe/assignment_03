@@ -38,3 +38,68 @@ Test it: pytest tests/test_streamlit.py -k process_files
 # README Step 7 names the two traps. The tests are built around them: choosing a
 # file without clicking must change nothing, and a rerun with the same file still
 # chosen must not count it again.
+
+import streamlit as st 
+import json
+
+from packaging_parser import parse_packaging
+
+st.title("Process Package Files")
+
+uploaded_file = st.file_uploader(
+    "Upload a package file",
+    key="package_file",
+    type=["txt"]
+)
+
+if "files_processed" not in st.session_state:
+    st.session_state.files_processed = 0
+
+if "packages_processed" not in st.session_state:
+    st.session_state.packages_processed = 0
+
+if "processed_files" not in st.session_state:
+    st.session_state.processed_files = []
+
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+if st.button("Process", key="process"):
+    if uploaded_file is not None:
+        if uploaded_file.name not in st.session_state.processed_files:
+
+            text = uploaded_file.getvalue().decode("utf-8")
+            packages = []
+
+            for line in text.splitlines():
+                line = line.strip()
+
+                if not line:
+                    continue
+
+                package = parse_packaging(line)
+                packages.append(package)
+
+            output_name = uploaded_file.name.replace(".txt", ".json")
+            output_path = f"data/{output_name}"
+
+            with open(output_path, "w") as f:
+                json.dump(packages, f, indent=4)
+
+            message = f"{len(packages)} packages written to {output_path}"
+
+            st.session_state.files_processed += 1
+            st.session_state.packages_processed += len(packages)
+            st.session_state.processed_files.append(uploaded_file.name)
+            st.session_state.history.append(message)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.metric("Files processed", st.session_state.files_processed)
+
+with col2:
+    st.metric("Packages processed", st.session_state.packages_processed)
+
+for message in st.session_state.history:
+    st.info(message)
